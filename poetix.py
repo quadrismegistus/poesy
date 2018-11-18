@@ -1,7 +1,7 @@
 ## encoding=utf-8
 from __future__ import division
 import sys,os,codecs
-import pytxt,cPickle,random,numpy as np,pystats
+import pytxt,cPickle,random,numpy as np
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -548,7 +548,7 @@ class Poem(object):
 				average_length_per_pos[k]=int(median)
 
 			SOME_possibilities = [[rx for rx in range(average_length_per_pos[x_i]-1,average_length_per_pos[x_i]+2)] for x_i,x in enumerate(range(seq_length))]
-			combo_possibilities = list(pystats.product(*SOME_possibilities))
+			combo_possibilities = list(product(*SOME_possibilities))
 			for combo in combo_possibilities:
 				if len(combo)>1 and len(set(combo))==1: continue
 				model_lengths=[]
@@ -730,7 +730,6 @@ class Poem(object):
 			return slice
 
 		def scheme2edges(scheme):
-			import pystats
 			id2pos={}
 			for i,x in enumerate(scheme):
 				# x is a rhyme id, i is the position in the scheme
@@ -741,13 +740,12 @@ class Poem(object):
 			rhymes=[]
 			for x in id2pos:
 				if len(id2pos[x])>1:
-					for a,b in pystats.product(id2pos[x], id2pos[x]):
+					for a,b in product(id2pos[x], id2pos[x]):
 						if a>=b: continue
 						rhymes+=[(a,b)]
 			return rhymes
 
 		def test_edges(scheme_exp,scheme_obs):
-			import pystats
 			edges_exp=scheme2edges(scheme_exp)
 			edges_obs=scheme2edges(scheme_obs)
 			set_edges_exp = set(edges_exp)
@@ -865,3 +863,15 @@ def schemenums2dict(scheme):
 			if x==xx:
 				d[i]=ii
 	return d
+
+
+
+#####
+# MISC FUNCTIONS
+#####
+
+def product(*args):
+	if not args:
+		return iter(((),)) # yield tuple()
+	return (items + (item,)
+		for items in product(*args[:-1]) for item in args[-1])
