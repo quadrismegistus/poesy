@@ -51,12 +51,24 @@ def test():
 
 
 class Poem(object):
-	def __init__(self,txt,id=None,title=None):
+	def __init__(self,txt=None,id=None,title=None,fn=None,fn_encoding='utf-8'):
+		if fn and not txt:
+			if os.path.exists(fn):
+				with codecs.open(fn,encoding=fn_encoding) as f:
+					txt=f.read()
+
+		if not txt: raise ValueError("Neither a txt string object was passed nor a working filename through fn=")
 		self.id=hash(txt) if not id else id
-		#print ">> gen {0} from TXT...".format(self.id)
+
 		txt=txt.strip()
 		txt=txt.replace('\r\n','\n').replace('\r','\n')
 		while '\n\n\n' in txt: txt=txt.replace('\n\n\n','\n\n')
+
+		##
+		# Unicode tricks
+		txt=txt.replace(u'è','-e')
+		##
+
 		self.title=title if title else txt.split('\n')[0].strip()
 		self.txt=txt
 
@@ -438,52 +450,161 @@ class Poem(object):
 		dx={}
 		dx['scheme']=scheme
 		dx['scheme_type']=self.schemetype(scheme)
-		dx['scheme_repr']=self.scheme_repr(dx['scheme_type'], dx['scheme'])
+		dx['scheme_repr']=self.scheme_repr(dx['scheme_type'], dx['scheme'],beat=beat)
 		dx['scheme_length']=len(scheme)
 		dx['scheme_diff']=sdiff
 		return dx
 
 	@property
 	def schemed(self):
-		return self.get_schemed()
+		return self.get_schemed(beat=True)
 
+	@property
+	def schemed_syll(self):
+		return self.get_schemed(beat=False)
+
+	@property
+	def schemed_beat(self):
+		return self.get_schemed(beat=True)
+
+	@property
+	def lineld(self):
+		old=[]
+		self.parse()
+		self.rhyme_net()
+
+		for lineid in sorted(self.lined):
+			odx={
+				'lineid':lineid,
+				'#line':lineid[0],
+				'#stanza':lineid[1],
+				'#line_in_stanza':self.linenums[lineid],
+				'lineid2':'%s.%s' % (lineid[1],self.linenums[lineid]),
+
+				'line':self.lined[lineid],
+				'parse':self.prosodic[lineid].parse_str(viols=True),
+				'num_parses':self.numparses[lineid],
+
+				'num_sylls':self.linelengths[lineid],
+				'num_feet':self.linelengths_bybeat[lineid],
+
+				'rhyme':self.rhymes[lineid],
+			}
+			old+=[odx]
+		return old
+
+	def show(self):
+		"""Show annotations
+		"""
+		ostr=[]
+		self.parse()
+		self.rhyme_net()
+		stanzanow=None
+
+		lineid2linestr=dict((lineid,line.parse_str(viols=False)) for lineid,line in sorted(self.prosodic.items()))
+		maxlinelen=max(len(l) for l in lineid2linestr.values())
+		linelen=maxlinelen+5
+
+		for lineid,line in sorted(self.prosodic.items()):
+			rimestr=self.rhymes[lineid]
+			linestr=line.parse_str(viols=False)
+			linenum=self.linenums[lineid]
+			stanzanum=lineid[1]
+			beatlen=self.linelengths_bybeat[lineid]
+			sylllen=self.linelengths[lineid]
+			if stanzanow!=stanzanum:
+				if ostr: ostr+=['']
+				stanzanow=stanzanum
+
+			oline='({stanza}.{linenum}) {line:<{linelen}} [{rime}] [{beat}/{syll}]'.format(
+				linelen=linelen,
+				rime=rimestr,
+				line=linestr,
+				stanza=stanzanum,
+				linenum=linenum,
+				beat=beatlen,
+				syll=sylllen)
+			ostr+=[oline]
+		return '\n'.join(ostr)
+
+	def summary(self,header=['lineid2', 'parse', 'rhyme', 'num_feet', 'num_sylls','num_parses']):
+		colnames={
+		'num_feet':'#feet',
+		'num_sylls':'#syll',
+		'lineid':'(#ln,#st)',
+		'lineid2':'(#s,#l)',
+		'rhyme':'rhyme',
+		'parse':'parse',
+		'num_parses':'#parse'
+		}
+
+		from tabulate import tabulate
+		data=[]
+		stanzanow=None
+		for row in self.lineld:
+			if stanzanow is None: stanzanow=row['#stanza']
+			if stanzanow!=row['#stanza']:
+				data+=['']
+				stanzanow=row['#stanza']
+
+			datarow=[row[h] for h in header]
+			data+=[datarow]
+		cols=[colnames.get(h,h) for h in header]
+		table=tabulate(data,headers=cols)
+
+		schemestr1='meter: {meter}\nfeet: {feet}\nsyllables: {syll}\nrhyme: {rhymename} ({rhymescheme})'.format(
+			meter=self.statd['meter_type_scheme'].title(),
+			feet=self.statd['beat_scheme_repr'],
+			syll=self.statd['syll_scheme_repr'],
+			rhymename=self.statd['rhyme_scheme_name'],
+			rhymescheme=self.statd['rhyme_scheme_form'],
+		)
+
+		ostr=table+'\n\n\nestimated schema\n----------\n'+schemestr1
+		print ostr
 
 	@property
 	def statd(self):
-		dx={}
+		if not hasattr(self,'_statd') or not self._statd:
+			dx=self._statd={}
 
-		## Scheme
-		for x,y in [('beat',True), ('syll',False)]:
-			sd=self.get_schemed(beat=y)
-			for sk,sv in sd.iteritems():
-				dx[x+'_'+sk]=sv
+			## Scheme
+			for x,y in [('beat',True), ('syll',False)]:
+				sd=self.get_schemed(beat=y)
+				for sk,sv in sd.iteritems():
+					dx[x+'_'+sk]=sv
 
-		## Length
-		dx['num_lines']=self.numLines
+			## Length
+			dx['num_lines']=self.numLines
 
-		## Meter
-		for k,v in self.meterd.items(): dx['meter_'+k]=v
+			## Meter
+			for k,v in self.meterd.items(): dx['meter_'+k]=v
 
-		## Rhyme
-		for k,v in self.rhymed.items():
-			if k=='rhyme_schemes': v=v[-5:]
-			dx[k]=v
-
-		return dx
-
+			## Rhyme
+			for k,v in self.rhymed.items():
+				if k=='rhyme_schemes': v=v[-5:]
+				dx[k]=v
+		return self._statd
 
 	def schemetype(self,scheme):
 		if len(scheme)==1: return 'Invariable'
 		if len(scheme)==2: return 'Alternating'
 		return 'Complex'
 
-	def scheme_repr(self,schemetype,scheme):
-		if schemetype=='Complex': return 'Complex'
-		prefix='Alt_' if schemetype=='Alternating' else 'Inv_'
-		return prefix+'_'.join(unicode(sx) for sx in scheme)
+	def scheme_repr(self,schemetype,scheme,beat=False):
+		#if schemetype=='Complex': return 'Complex'
+		#prefix='Alt_' if schemetype=='Alternating' else 'Inv_'
+		if beat and schemetype!='Complex': scheme=[BEATNAMES.get(sx,sx) for sx in scheme]
+		if schemetype=='Invariable':
+			return scheme[0]
+		# elif schemetype=='Complex':
+		#
+		# 	return
+		schemedetails='('+'-'.join(unicode(sx) for sx in scheme)+')'
+		return schemetype+' '+schemedetails.lower()
 
 
-	def get_scheme(self,beat=True,return_diff=False):
+	def get_scheme(self,beat=True,return_diff=False,encourage_invariable=True):
 		stanza_length=self.stanza_length
 		if beat:
 			lengths=[v for k,v in sorted(self.linelengths_bybeat.items())]
@@ -505,18 +626,20 @@ class Poem(object):
 		max_seq_length=stanza_length if stanza_length else 12
 
 
-		def measure_diff(l1,l2):
+		def measure_diff(l1,l2,beat=False):
 			min_l=min([len(l1),len(l2)])
 			l1=l1[:min_l]
 			l2=l2[:min_l]
-			"""print len(l1),len(l2)
+			"""
+			print len(l1),len(l2)
 			print '  '.join(unicode(x) for x in l1)
 			print '  '.join(unicode(x) for x in l2)
-			print '  '.join(unicode(abs(x1-x2)) for x1,x2 in zip(l1,l2))"""
+			print '  '.join(unicode(abs(x1-x2)) for x1,x2 in zip(l1,l2))
+			#"""
 			diff=0
 			for x1,x2 in zip(l1,l2):
 				diff+=abs(x1-x2)
-			return diff
+			return diff if not beat else diff*2
 
 		combo2diff={}
 		best_combo=None
@@ -549,9 +672,12 @@ class Poem(object):
 				model_lengths=model_lengths[:len(lengths)]
 
 				diff_in_lengths=abs(len(lengths) - len(model_lengths))
-				diff=measure_diff(lengths, model_lengths)
+				diff=measure_diff(lengths, model_lengths, beat=beat)
 				if not beat:
 					diff+=sum([5 if seq_x%2 else 0 for seq_x in combo])
+				if encourage_invariable:
+					diff+=1 if len(set(combo))>1 else 0
+
 				diff=diff
 
 
@@ -619,16 +745,63 @@ class Poem(object):
 		return self._linelength
 
 
+	## Meter
+
+	@property
+	def numparses(self):
+		if not hasattr(self,'_numparses'):
+			self._numparses=npd={}
+			for lineid in self.prosodic:
+				line=self.prosodic[lineid]
+				npd[lineid]=line.ambiguity #@IMPORTANT look at this code in prosodic/lib/Text
+		return self._numparses
+
 
 
 
 	## RHYME
 
 	@property
+	def linenums(self):
+		"""
+		Within stanza numberings
+		"""
+		if not hasattr(self,'_linenums'):
+			rd=self._linenums={}
+			stanzanow=None
+			linenum=0
+			for lineid,line in sorted(self.lined.items()):
+				if lineid[1]!=stanzanow:
+					stanzanow=lineid[1]
+					linenum=0
+				linenum+=1
+				rd[lineid]=linenum
+		return self._linenums
+
+	@property
+	def rhymes(self):
+		if not hasattr(self,'_rhymes'):
+			rd=self._rhymes={}
+			for lineid,line in sorted(self.lined.items()):
+				try:
+					rimestr=self.rhyme_ids[lineid[0]-1]
+				except IndexError:
+					rimestr='?'
+				rd[lineid]=rimestr
+		return self._rhymes
+
+	@property
+	def rhyme_ids(self):
+		if not hasattr(self,'_rhyme_ids'):
+			self.rhyme_net()
+			self._rhyme_ids=nums2scheme(self.rime_ids)
+		return self._rhyme_ids
+
+	@property
 	def rhymed(self):
 		if hasattr(self,'_rhymed'): return self._rhymed
 		self.rhyme_net()
-		self._ryhmed=odx=self.discover_rhyme_scheme(self.rime_ids)
+		self._rhymed=odx=self.discover_rhyme_scheme(self.rime_ids)
 		return odx
 
 
@@ -850,6 +1023,10 @@ def scheme2nums(scheme):
 	scheme_nums=[alphabet.index(letter)+1 if scheme.count(letter)>1 else 0 for letter in scheme]
 	return scheme_nums
 
+def nums2scheme(nums):
+	alphabet='-abcdefghijklmnopqrstuvwxyz'
+	return [alphabet[n] if n<len(alphabet) else n for n in nums]
+
 def transpose_up(slice):
 	import string
 	return ''.join(string.ascii_lowercase[sx-1] if sx else 'x' for sx in slice)
@@ -862,6 +1039,7 @@ def schemenums2dict(scheme):
 			if x==xx:
 				d[i]=ii
 	return d
+
 
 
 
@@ -894,6 +1072,8 @@ def toks2freq(l,tfy=False):
 			c[k]=v/summ
 	return c
 
+
+
 def slicex(l,num_slices=None,slice_length=None,runts=True,random=False):
 	"""
 	Returns a new list of n evenly-sized segments of the original list
@@ -906,3 +1086,12 @@ def slicex(l,num_slices=None,slice_length=None,runts=True,random=False):
 	newlist=[l[i:i+slice_length] for i in range(0, len(l), slice_length)]
 	if runts: return newlist
 	return [lx for lx in newlist if len(lx)==slice_length]
+
+
+
+## Constants
+
+BEATNAMES = {
+	1:'Monometer',2:'Dimeter',3:'Trimeter',4:'Tetrameter',
+	5:'Pentameter',6:'Hexameter',7:'Heptameter',8:'Octameter',
+	9: 'Enneameter', 10:'Decameter', 11:'Hendecameter',12:'Dodecameter'}
