@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name='poetix',
-    version='0.0.7',
+    version='0.0.9',
     description=('Poetix: Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
