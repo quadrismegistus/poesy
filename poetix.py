@@ -1,8 +1,9 @@
 ## encoding=utf-8
 from __future__ import division
 import sys,os,codecs
-import pytxt,cPickle,random,numpy as np
+import cPickle,random,numpy as np
 import logging
+from collections import Counter
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -47,22 +48,12 @@ def test():
 	p=Poem(poemtxt)
 	return p.rhymed
 
-def variant2standard():
-	return dict((d['variant'],d['standard']) for d in pytxt.tsv2ld('/Dropbox/LITLAB/TOOLS/spellings/variants.txt',header=['variant','standard','']))
-
-def standard2variant():
-	v2s=variant2standard()
-	d={}
-	for v,s in v2s.items():
-		if not s in d: d[s]=[]
-		d[s]+=[v]
-	return d
 
 
 
 class Poem(object):
 	def __init__(self,txt,id=None,title=None):
-		self.id=pytxt.hash(txt) if not id else id
+		self.id=hash(txt) if not id else id
 		#print ">> gen {0} from TXT...".format(self.id)
 		txt=txt.strip()
 		txt=txt.replace('\r\n','\n').replace('\r','\n')
@@ -132,7 +123,7 @@ class Poem(object):
 		"""
 		if hasattr(self,'_stanza_length'): return self._stanza_length
 		stanza_lens = [len(st) for st in self.stanzas]
-		lenfreq=pytxt.toks2freq(stanza_lens)
+		lenfreq=Counter(stanza_lens)
 		mostcommonlen=[_k for _k in sorted(lenfreq,key=lambda __k: -lenfreq[__k])][0]
 
 		if not stanza_lens or len(stanza_lens)==1:
@@ -204,11 +195,12 @@ class Poem(object):
 			ws_fourths += [pure_parse[3:4]]
 			all_mstrs+=mstrs
 
-		mstr_freqs=pytxt.toks2freq(all_mstrs,tfy=True)
+
+		mstr_freqs=toks2freq(all_mstrs,tfy=True)
 		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
-		for k,v in pytxt.toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
-		for k,v in pytxt.toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
-		for k,v in pytxt.toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
+		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
+		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
 
 
 		## DECIDE WHETHER TERNARY / BINARY FOOT
@@ -329,12 +321,12 @@ class Poem(object):
 
 			all_mstrs+=mstrs
 
-		mstr_freqs=pytxt.toks2freq(all_mstrs,tfy=True)
+		mstr_freqs=toks2freq(all_mstrs,tfy=True)
 		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
 
-		for k,v in pytxt.toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
-		for k,v in pytxt.toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
-		for k,v in pytxt.toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
+		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
+		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
 
 		d=datad
 		#d['type_foot']='ternary' if d.get('mpos_ww',0)>0.15 and d.get('mpos_w',0)<.35 else 'binary'
@@ -766,7 +758,7 @@ class Poem(object):
 		def test_scheme(scheme):
 			logging.debug(("scheme:",scheme))
 			scheme_nums=scheme2nums(scheme)
-			slices=pytxt.slice(rime_ids,slice_length=len(scheme_nums),runts=True)
+			slices=slice(rime_ids,slice_length=len(scheme_nums),runts=True)
 			matches=[]
 
 			logging.debug((">> RIME IDS:",rime_ids))
@@ -881,3 +873,30 @@ def read_tsv(fn,sep='\t'):
 	import csv
 	with codecs.open(fn,encoding='utf-8') as f:
 		return list(csv.DictReader(f,delimiter=sep))
+
+def hash(string):
+	import hashlib
+	if type(string)==unicode:
+		string=string.encode('utf-8')
+	return str(hashlib.sha224(string).hexdigest())
+
+def toks2freq(l,tfy=False):
+	c=Counter(l)
+	if tfy:
+		sum=float(sum(c.values()))
+		for k,v in c.items():
+			c[k]=v/sum
+	return c
+
+def slice(l,num_slices=None,slice_length=None,runts=True,random=False):
+	"""
+	Returns a new list of n evenly-sized segments of the original list
+	"""
+	if random:
+		import random
+		random.shuffle(l)
+	if not num_slices and not slice_length: return l
+	if not slice_length: slice_length=int(len(l)/num_slices)
+	newlist=[l[i:i+slice_length] for i in range(0, len(l), slice_length)]
+	if runts: return newlist
+	return [lx for lx in newlist if len(lx)==slice_length]
