@@ -1,0 +1,3 @@
+[submodule "prosodic"]
+	path = prosodic
+	url = https://github.com/quadrismegistus/prosodic

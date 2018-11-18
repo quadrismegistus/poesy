@@ -7,10 +7,11 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Constants
-PATH_ROOT = '/Users/ryan/DH/poetry'
-PATH_RHYME_SCHEMES = PATH_ROOT+'/rhyme/schemes.xls'
-RHYME_SCHEMES=[d for d in pytxt.read_ld(PATH_RHYME_SCHEMES)] # if not 'sonnet' in d['form'].lower()]
-METER='meter_ryan'
+PATH_RHYME_SCHEMES = 'schemes/rhyme_schemes.txt'
+RHYME_SCHEMES=[d for d in read_tsv(PATH_RHYME_SCHEMES)] # if not 'sonnet' in d['form'].lower()]
+
+DEFAULT_METER='meter_ryan'
+
 MAX_RHYME_DIST=5
 
 def test():
@@ -875,3 +876,8 @@ def product(*args):
 		return iter(((),)) # yield tuple()
 	return (items + (item,)
 		for items in product(*args[:-1]) for item in args[-1])
+
+def read_tsv(fn,sep='\t'):
+	import csv
+	with codecs.open(fn,encoding='utf-8') as f:
+		return list(csv.DictReader(f,delimiter=sep))
