@@ -761,7 +761,7 @@ class Poem(object):
 		def test_scheme(scheme):
 			logging.debug(("scheme:",scheme))
 			scheme_nums=scheme2nums(scheme)
-			slices=slice(rime_ids,slice_length=len(scheme_nums),runts=True)
+			slices=slicex(rime_ids,slice_length=len(scheme_nums),runts=True)
 			matches=[]
 
 			logging.debug((">> RIME IDS:",rime_ids))
@@ -792,11 +792,11 @@ class Poem(object):
 
 		for schemed in RHYME_SCHEMES:
 			#if not 'shakespeare' in schemed['form']: continue
-			logging.debug(('>> TESTING SCHEME:',schemed['form']))
-			scheme=schemed['scheme']
+			logging.debug(('>> TESTING SCHEME:',schemed['Form']))
+			scheme=schemed['Scheme']
 			scheme_score=test_scheme(scheme)
 			#if scheme_score:
-			scheme_scores[(schemed['form'],scheme)]=scheme_score
+			scheme_scores[(schemed['Form'],scheme)]=scheme_score
 
 		odx['rhyme_schemes']=sorted(scheme_scores.items(),key=lambda lt: lt[1])
 		#for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (lt[1],-len(lt[0]))):
@@ -894,7 +894,7 @@ def toks2freq(l,tfy=False):
 			c[k]=v/summ
 	return c
 
-def slice(l,num_slices=None,slice_length=None,runts=True,random=False):
+def slicex(l,num_slices=None,slice_length=None,runts=True,random=False):
 	"""
 	Returns a new list of n evenly-sized segments of the original list
 	"""
