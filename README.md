@@ -2,6 +2,8 @@
 
 ## Poetic processing, for Python ##
 
+Code developed in the Stanford Literary Lab's "Transhistorical Poetry Project" by Ryan Heuser (@quadrismegistus), J.D. Porter, Jonathan Sensenbaugh, Justin Tackett, Mark Algee-Hewitt, and Maria Kraxenberger. Cleaned and modified from [its original form](http://github.com/quadrismegistus/litlab-poetry) in 2018.
+
 ### poem = Poem()
 
 ```python
