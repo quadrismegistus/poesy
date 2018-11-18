@@ -2,7 +2,7 @@ import os,sys
 from setuptools import setup
 _here = os.path.abspath(os.path.dirname(__file__))
 
-with open("README.rst", "r") as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r") as fh:
@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name='poetix',
-    version='0.0.9',
+    version='0.0.11',
     description=('Poetix: Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
