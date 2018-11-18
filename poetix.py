@@ -552,12 +552,12 @@ class Poem(object):
 		cols=[colnames.get(h,h) for h in header]
 		table=tabulate(data,headers=cols)
 
-		schemestr1='meter: {meter}\nfeet: {feet}\nsyllables: {syll}\nrhyme: {rhymename} ({rhymescheme})'.format(
+		schemestr1='meter: {meter}\nfeet: {feet}\nsyllables: {syll}\nrhyme: {rhymename} {rhymescheme}'.format(
 			meter=self.statd['meter_type_scheme'].title(),
 			feet=self.statd['beat_scheme_repr'],
 			syll=self.statd['syll_scheme_repr'],
 			rhymename=self.statd['rhyme_scheme_name'],
-			rhymescheme=self.statd['rhyme_scheme_form'],
+			rhymescheme='(%s)' % self.statd['rhyme_scheme_form'] if self.statd['rhyme_scheme_form'] else '',
 		)
 
 		ostr=table+'\n\n\nestimated schema\n----------\n'+schemestr1
@@ -582,7 +582,7 @@ class Poem(object):
 
 			## Rhyme
 			for k,v in self.rhymed.items():
-				if k=='rhyme_schemes': v=v[-5:]
+				if k=='rhyme_schemes' and v: v=v[-5:]
 				dx[k]=v
 		return self._statd
 
@@ -800,8 +800,13 @@ class Poem(object):
 	@property
 	def rhymed(self):
 		if hasattr(self,'_rhymed'): return self._rhymed
+		self._rhymed=odx={}
+		odx['rhyme_scheme']=''
+		odx['rhyme_scheme_name']=''
+		odx['rhyme_scheme_form']=''
+		odx['rhyme_scheme_accuracy']=''
 		self.rhyme_net()
-		self._rhymed=odx=self.discover_rhyme_scheme(self.rime_ids)
+		for k,v in self.discover_rhyme_scheme(self.rime_ids).items(): odx[k]=v
 		return odx
 
 
