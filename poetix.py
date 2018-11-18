@@ -9,9 +9,8 @@ logger.setLevel(logging.INFO)
 
 # Constants
 PATH_RHYME_SCHEMES = 'schemes/rhyme_schemes.txt'
-RHYME_SCHEMES=[d for d in read_tsv(PATH_RHYME_SCHEMES)] # if not 'sonnet' in d['form'].lower()]
-
-DEFAULT_METER='meter_ryan'
+RHYME_SCHEMES=None
+METER='meter_ryan'
 
 MAX_RHYME_DIST=5
 
@@ -711,6 +710,10 @@ class Poem(object):
 
 
 	def discover_rhyme_scheme(self,rime_ids):
+		global RHYME_SCHEMES
+		if not RHYME_SCHEMES:
+			RHYME_SCHEMES=[d for d in read_tsv(PATH_RHYME_SCHEMES)]
+
 		odx={'rhyme_scheme':None, 'rhyme_scheme_accuracy':None, 'rhyme_schemes':None}
 		if not rime_ids: return odx
 
@@ -784,6 +787,9 @@ class Poem(object):
 			return match_score
 
 		scheme_scores={}
+
+
+
 		for schemed in RHYME_SCHEMES:
 			#if not 'shakespeare' in schemed['form']: continue
 			logging.debug(('>> TESTING SCHEME:',schemed['form']))
@@ -883,9 +889,9 @@ def hash(string):
 def toks2freq(l,tfy=False):
 	c=Counter(l)
 	if tfy:
-		sum=float(sum(c.values()))
+		summ=float(sum(c.values()))
 		for k,v in c.items():
-			c[k]=v/sum
+			c[k]=v/summ
 	return c
 
 def slice(l,num_slices=None,slice_length=None,runts=True,random=False):
