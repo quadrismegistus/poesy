@@ -127,4 +127,8 @@ git clone git@github.com:quadrismegistus/poetix.git
 
 #### 2. (optional) espeak
 
-[Espeak](http://espeak.sourceforge.net/) is an open-source TTS engine for Windows and Unix systems (including Mac OS X). You can [download it for your operating system here](http://espeak.sourceforge.net/download.html). But if you're running Mac OS X, an even simpler way to install espeak is via the [HomeBrew package manager](http://brew.sh/). To do so, install homebrew if you haven't, and then run in a terminal: `brew install espeak`.
+[Espeak](http://espeak.sourceforge.net/) is an open-source TTS engine for Windows and Unix systems (including Mac OS X). Poetix, built on [Prosodic](https://github.com/quadrismegistus/prosodic), uses it in order to sound out unfamiliar words.
+
+[Download Espeak for your operating system here](http://espeak.sourceforge.net/download.html). Or, if you're running Mac OS X, install espeak with the [HomeBrew package manager](http://brew.sh/):
+
+```brew install espeak```
