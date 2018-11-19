@@ -122,6 +122,8 @@ To install by latest github source, either [download the zip file](https://githu
 
 ```
 git clone git@github.com:quadrismegistus/poetix.git
+cd poetix
+python setup.py develop
 ```
 
 

@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name='poetix',
-    version='0.1.1',
+    version='0.1.2',
     description=('Poetix: Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -18,7 +18,7 @@ setup(
     author_email='heuser@stanford.edu',
     url='https://github.com/quadrismegistus/poetix',
     license='MPL-2.0',
-    packages=['poetix','prosodic'],
+    packages=['poetix'],
     install_requires=requirements,
     include_package_data=True,
     classifiers=[
