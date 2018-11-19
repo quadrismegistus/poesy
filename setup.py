@@ -9,16 +9,16 @@ with open("requirements.txt", "r") as fh:
     requirements = [x.strip() for x in fh.read().split('\n') if x.strip()]
 
 setup(
-    name='poetix',
-    version='0.1.2',
-    description=('Poetix: Poetic processing, for Python'),
+    name='poetics',
+    version='0.1.4',
+    description=('Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Ryan Heuser',
     author_email='heuser@stanford.edu',
-    url='https://github.com/quadrismegistus/poetix',
+    url='https://github.com/quadrismegistus/poetics',
     license='MPL-2.0',
-    packages=['poetix'],
+    packages=['poetics'],
     install_requires=requirements,
     include_package_data=True,
     classifiers=[
