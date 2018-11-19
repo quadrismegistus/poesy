@@ -1,4 +1,4 @@
-# Poetics
+# Poesy
 
 ## Poetic processing, for Python ##
 
@@ -7,7 +7,7 @@ Code developed in the Stanford Literary Lab's "Transhistorical Poetry Project" b
 ### Create a poem: `poem = Poem()`
 
 ```python
-from poetics import Poem
+from poesy import Poem
 
 # create a Poem object by string
 poem = Poem("""
@@ -107,25 +107,25 @@ la_belle_dame = Poem(fn='poems/keats.la_belle_dame_sans_merci.txt')
 
 ## Installing
 
-### 1. Poetics
+### 1. Poesy
 
 Install from pip (preferred):
 
 ```
-pip install poetics
+pip install poesy
 ```
 
 Or install latest sources (advanced):
 
 ```
-git clone git@github.com:quadrismegistus/poetics.git
-cd poetics
+git clone git@github.com:quadrismegistus/poesy.git
+cd poesy
 python setup.py develop
 ```
 
 ### 2. (optional) eSpeak
 
-[eSpeak](http://espeak.sourceforge.net/) is an open-source TTS engine for Windows and Unix systems (including Mac OS X). Poetics, built on [Prosodic](https://github.com/quadrismegistus/prosodic), uses it in order to sound out unfamiliar words.
+[eSpeak](http://espeak.sourceforge.net/) is an open-source TTS engine for Windows and Unix systems (including Mac OS X). Poesy, built on [Prosodic](https://github.com/quadrismegistus/prosodic), uses it in order to sound out unfamiliar words.
 
 [Download eSpeak for your operating system](http://espeak.sourceforge.net/download.html). Or, if you're running Mac OS X, install eSpeak with the [HomeBrew package manager](http://brew.sh/):
 
