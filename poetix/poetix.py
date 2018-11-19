@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 # Constants
 PATH_RHYME_SCHEMES = os.path.join(os.path.dirname(__file__),'schemes','rhyme_schemes.txt')
 RHYME_SCHEMES=None
-METER='meter_ryan'
+METER='meter_default'
 
 MAX_RHYME_DIST=5
 
@@ -51,7 +51,7 @@ def test():
 
 
 class Poem(object):
-	def __init__(self,txt=None,id=None,title=None,fn=None,fn_encoding='utf-8'):
+	def __init__(self,txt=None,id=None,title=None,fn=None,fn_encoding='utf-8',meter=METER):
 		if fn and not txt:
 			if os.path.exists(fn):
 				with codecs.open(fn,encoding=fn_encoding) as f:
@@ -59,6 +59,8 @@ class Poem(object):
 
 		if not txt: raise ValueError("Neither a txt string object was passed nor a working filename through fn=")
 		self.id=hash(txt) if not id else id
+		self.meter=meter
+
 
 		txt=txt.strip()
 		txt=txt.replace('\r\n','\n').replace('\r','\n')
@@ -256,15 +258,15 @@ class Poem(object):
 			avg_linelength+=[line_parselen]
 			ambigx=reduce(operator.mul, line_numparses, 1)
 			ambig+=[ambigx]
-		d['ambiguity']=np.mean(ambig)
-		d['length_avg_line']=np.mean(avg_linelength)
-		d['length_avg_parse']=np.mean(avg_parselength)
+		d['ambiguity']=np.mean(ambig) if ambig else ''
+		d['length_avg_line']=np.mean(avg_linelength) if avg_linelength else ''
+		d['length_avg_parse']=np.mean(avg_parselength) if avg_parselength else ''
 
 
 		## TOTAL METRICAL VIOLATIONS
 		sumviol=0
 		for ck,cv in viold.items():
-			avg=np.mean(cv)
+			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
 
@@ -380,24 +382,24 @@ class Poem(object):
 			avg_linelength+=[line_parselen]
 			ambigx=reduce(operator.mul, line_numparses, 1)
 			ambig+=[ambigx]
-		d['ambiguity']=np.mean(ambig)
-		d['length_avg_line']=np.mean(avg_linelength)
-		d['length_avg_parse']=np.mean(avg_parselength)
+		d['ambiguity']=np.mean(ambig) if ambig else ''
+		d['length_avg_line']=np.mean(avg_linelength) if ambig else ''
+		d['length_avg_parse']=np.mean(avg_parselength) if ambig else ''
 
 
 		## VIOLATIONS
 		sumviol=0
 		for ck,cv in viold.items():
-			avg=np.mean(cv)
+			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
 
 		d['constraint_TOTAL']=sumviol
 		return datad
 
-	@property
-	def meter(self):
-		return self.meterd['type_scheme']
+	#@property
+	#def meter(self):
+	#	return self.meterd['type_scheme']
 
 	@property
 	def parsed(self):
@@ -437,7 +439,8 @@ class Poem(object):
 
 		return parsed
 
-	def parse(self,lim=None,meter=METER):
+	def parse(self,lim=None,meter=None):
+		if not meter: meter=self.meter
 		if hasattr(self,'_parsed') and self._parsed:
 			return
 		for _i,(li,line) in enumerate(self.prosodic.items()):
@@ -693,7 +696,7 @@ class Poem(object):
 					if len(combo)<len(best_combo):
 						best_combo=combo
 						best_diff=diff
-					elif np.mean(combo)>np.mean(best_combo):
+					elif np.mean(combo) if combo else 0 > np.mean(best_combo) if best_combo else 0:
 						best_diff=diff
 						best_combo=combo
 
@@ -710,7 +713,7 @@ class Poem(object):
 		return self.get_scheme(beat=True)
 
 	@property
-	def prosodic(self,meter=METER):
+	def prosodic(self):
 		if not hasattr(self,'_prosodic'):
 			import prosodic as p
 			p.config['print_to_screen']=0
@@ -718,7 +721,7 @@ class Poem(object):
 			numlines=len(self.lined)
 			for _i,(i,line) in enumerate(sorted(self.lined.items())):
 				line=line.replace('-',' ').replace("'","").strip()
-				pd[i]=p.Text(line,meter=meter)
+				pd[i]=p.Text(line,meter=self.meter)
 		return self._prosodic
 
 	@property
@@ -874,7 +877,7 @@ class Poem(object):
 
 		self.rhyme_scheme=''
 		self.rhyme_scheme_accuracy=''
-		self.rhyme_weight_avg=np.mean(weights)
+		self.rhyme_weight_avg=np.mean(weights) if weights else ''
 
 		self.rhymeG=G
 		if toprint:
@@ -961,7 +964,7 @@ class Poem(object):
 				# translate down
 
 			#print matches
-			match_score=np.mean(matches) - did_not_divide
+			match_score=(np.mean(matches) if matches else 0) - did_not_divide
 			return match_score
 
 		scheme_scores={}
