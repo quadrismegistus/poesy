@@ -481,8 +481,8 @@ class Poem(object):
 				'lineid':lineid,
 				'#line':lineid[0],
 				'#stanza':lineid[1],
-				'#line_in_stanza':self.linenums[lineid],
-				'lineid2':'%s.%s' % (lineid[1],self.linenums[lineid]),
+				'#line_in_stanza':self.linenums_bystanza[lineid],
+				'lineid2':'%s.%s' % (lineid[1],self.linenums_bystanza[lineid]),
 
 				'line':self.lined[lineid],
 				'parse':self.prosodic[lineid].parse_str(viols=True),
@@ -511,7 +511,7 @@ class Poem(object):
 		for lineid,line in sorted(self.prosodic.items()):
 			rimestr=self.rhymes[lineid]
 			linestr=line.parse_str(viols=False)
-			linenum=self.linenums[lineid]
+			linenum=self.linenums_bystanza[lineid]
 			stanzanum=lineid[1]
 			beatlen=self.linelengths_bybeat[lineid]
 			sylllen=self.linelengths[lineid]
@@ -762,10 +762,18 @@ class Poem(object):
 
 
 
-	## RHYME
 
 	@property
 	def linenums(self):
+		return dict((lineid,lineid[0]) for lineid in self.lined)
+
+	@property
+	def stanzanums(self):
+		return dict((lineid,lineid[1]) for lineid in self.lined)
+
+
+	@property
+	def linenums_bystanza(self):
 		"""
 		Within stanza numberings
 		"""
@@ -781,6 +789,7 @@ class Poem(object):
 				rd[lineid]=linenum
 		return self._linenums
 
+	## RHYME
 	@property
 	def rhymes(self):
 		if not hasattr(self,'_rhymes'):
@@ -979,7 +988,7 @@ class Poem(object):
 			#if scheme_score:
 			scheme_scores[(schemed['Form'],scheme)]=scheme_score
 
-		odx['rhyme_schemes']=sorted(scheme_scores.items(),key=lambda lt: lt[1])
+		odx['rhyme_schemes']=sorted(scheme_scores.items(),key=lambda lt: -lt[1])[:5]
 		#for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (lt[1],-len(lt[0]))):
 		# @NEW jaccard
 		for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (-lt[1],-len(lt[0]))):
