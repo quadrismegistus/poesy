@@ -9,7 +9,7 @@ with open("requirements.txt", "r") as fh:
     requirements = [x.strip() for x in fh.read().split('\n') if x.strip()]
 
 setup(
-    name='poetics',
+    name='py-poetics',
     version='0.1.4',
     description=('Poetic processing, for Python'),
     long_description=long_description,

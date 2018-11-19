@@ -5,4 +5,4 @@
 MANIFEST.in
 build/
 dist/
-poetics.egg-info/
+py_poetics.egg-info/
