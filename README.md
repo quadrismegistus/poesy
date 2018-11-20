@@ -34,28 +34,6 @@ python setup.py develop
 brew install espeak
 ```
 
-## Configure
-
-Poesy depends on [Prosodic](http://github.com/quadrismegistus/prosodic) for metrical parsing. Prosodic stores its configuration data in `~/prosodic_data/`; the `README.txt` there has more information.
-
-By default, Poesy will use `~/prosodic_data/meters/meter_default.py` as its meter (its set of metrical constraints and behaviors). Open that file to read more details.
-
-To specify a different meter, pass a meter name to a Poem object:
-
-```python
-from poesy import Poem
-poem = Poem(fn='poems/shakespeare_sonnets/sonnet-001.txt',
-            meter='iambic_pentameter')
-```
-Or to the parse method:
-
-```python
-poem.parse(meter='iambic_pentameter')
-```
-
-These will load the meter in `~/prosodic_data/meters/iambic_pentameter.py`.
-
-
 ## Usage
 
 ### Create a poem: `poem = Poem()`
@@ -200,3 +178,25 @@ poem.linelengths_bybeat    # lineid -> length of line (in feet)
 poem.numparses             # lineid -> number of plausible parses for line
 poem.rhymes                # lineid -> rhyme scheme symbol
 ```
+
+
+## Configure
+
+Poesy depends on [Prosodic](http://github.com/quadrismegistus/prosodic) for metrical parsing. Prosodic stores its configuration data in `~/prosodic_data/`; the `README.txt` there has more information.
+
+By default, Poesy will use `~/prosodic_data/meters/meter_default.py` as its meter (its set of metrical constraints and behaviors). Open that file to read more details.
+
+To specify a different meter, pass a meter name to a Poem object:
+
+```python
+from poesy import Poem
+poem = Poem(fn='poems/shakespeare_sonnets/sonnet-001.txt',
+            meter='iambic_pentameter')
+```
+Or to the parse method:
+
+```python
+poem.parse(meter='iambic_pentameter')
+```
+
+These will load the meter in `~/prosodic_data/meters/iambic_pentameter.py`.
