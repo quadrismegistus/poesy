@@ -195,7 +195,7 @@ class Poem(object):
 			pure_parse=''
 			for parse in bp:
 				for mpos in parse.positions:
-					for ck,cv in list(mpos.constraintScores.items()):
+					for ck,cv in mpos.constraintScores.items():
 						ck=ck.name
 						if not ck in viold: viold[ck]=[]
 						viold[ck]+=[0 if not cv else 1]
@@ -211,10 +211,10 @@ class Poem(object):
 
 
 		mstr_freqs=toks2freq(all_mstrs,tfy=True)
-		for k,v in list(mstr_freqs.items()): datad['mpos_'+k]=v
-		for k,v in list(toks2freq(ws_ends,tfy=True).items()): datad['perc_lines_ending_'+k]=v
-		for k,v in list(toks2freq(ws_starts,tfy=True).items()): datad['perc_lines_starting_'+k]=v
-		for k,v in list(toks2freq(ws_fourths,tfy=True).items()): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
+		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
+		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
+		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
 
 
 		## DECIDE WHETHER TERNARY / BINARY FOOT
@@ -266,7 +266,7 @@ class Poem(object):
 
 		## TOTAL METRICAL VIOLATIONS
 		sumviol=0
-		for ck,cv in list(viold.items()):
+		for ck,cv in viold.items():
 			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
@@ -319,7 +319,7 @@ class Poem(object):
 			pure_parse=''
 			for parse in bp:
 				for mpos in parse.positions:
-					for ck,cv in list(mpos.constraintScores.items()):
+					for ck,cv in mpos.constraintScores.items():
 						ck=ck.name
 						if not ck in viold: viold[ck]=[]
 						viold[ck]+=[0 if not cv else 1]
@@ -336,11 +336,11 @@ class Poem(object):
 			all_mstrs+=mstrs
 
 		mstr_freqs=toks2freq(all_mstrs,tfy=True)
-		for k,v in list(mstr_freqs.items()): datad['mpos_'+k]=v
+		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
 
-		for k,v in list(toks2freq(ws_ends,tfy=True).items()): datad['perc_lines_ending_'+k]=v
-		for k,v in list(toks2freq(ws_starts,tfy=True).items()): datad['perc_lines_starting_'+k]=v
-		for k,v in list(toks2freq(ws_fourths,tfy=True).items()): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
+		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
+		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
 
 		d=datad
 		#d['type_foot']='ternary' if d.get('mpos_ww',0)>0.15 and d.get('mpos_w',0)<.35 else 'binary'
@@ -390,7 +390,7 @@ class Poem(object):
 
 		## VIOLATIONS
 		sumviol=0
-		for ck,cv in list(viold.items()):
+		for ck,cv in viold.items():
 			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
@@ -506,7 +506,7 @@ class Poem(object):
 		stanzanow=None
 
 		lineid2linestr=dict((lineid,line.parse_str(viols=False)) for lineid,line in sorted(self.prosodic.items()))
-		maxlinelen=max(len(l) for l in list(lineid2linestr.values()))
+		maxlinelen=max(len(l) for l in lineid2linestr.values())
 		linelen=maxlinelen+5
 
 		for lineid,line in sorted(self.prosodic.items()):
@@ -582,10 +582,10 @@ class Poem(object):
 			dx['num_lines']=self.numLines
 
 			## Meter
-			for k,v in list(self.meterd.items()): dx['meter_'+k]=v
+			for k,v in self.meterd.items(): dx['meter_'+k]=v
 
 			## Rhyme
-			for k,v in list(self.rhymed.items()):
+			for k,v in self.rhymed.items():
 				if k=='rhyme_schemes' and v: v=v[-5:]
 				dx[k]=v
 		return self._statd
@@ -662,12 +662,12 @@ class Poem(object):
 			average_length_per_pos=dict((s_i,[]) for s_i in range(seq_length))
 			for l_i,l_x in enumerate(lengths):
 				average_length_per_pos[l_i % seq_length] += [l_x]
-			for k,v in list(average_length_per_pos.items()):
+			for k,v in average_length_per_pos.items():
 				median=np.median(v) if len(v)>1 else v[0]
 				average_length_per_pos[k]=int(median)
 
 			SOME_possibilities = [[rx for rx in range(average_length_per_pos[x_i]-1,average_length_per_pos[x_i]+2)] for x_i,x in enumerate(range(seq_length))]
-			combo_possibilities = list(product(*SOME_possibilities))
+			combo_possibilities = product(*SOME_possibilities)
 			for combo in combo_possibilities:
 				if len(combo)>1 and len(set(combo))==1: continue
 				model_lengths=[]
@@ -819,7 +819,7 @@ class Poem(object):
 		odx['rhyme_scheme_form']=''
 		odx['rhyme_scheme_accuracy']=''
 		self.rhyme_net()
-		for k,v in list(self.discover_rhyme_scheme(self.rime_ids).items()): odx[k]=v
+		for k,v in self.discover_rhyme_scheme(self.rime_ids).items(): odx[k]=v
 		return odx
 
 
@@ -855,7 +855,7 @@ class Poem(object):
 		for node in sorted(G.nodes()):
 			#print "NODE",node
 			edged=G.edge if hasattr(G,'edge') else G.adj  # diff versions of networkx?
-			neighbors=sorted(list(edged[node].keys()),key=lambda n2: G[node][n2]['weight'])
+			neighbors=sorted(edged[node].keys(),key=lambda n2: G[node][n2]['weight'])
 			#neighbors=[n for n in neighbors if n>node]
 			closest_neighbor=neighbors[0]
 			#print 'closest neighbor:',closest_neighbor
@@ -910,7 +910,7 @@ class Poem(object):
 
 		def translate_slice(slice):
 			unique_numbers=set(slice)
-			unique_numbers_ordered=sorted(list(unique_numbers))
+			unique_numbers_ordered=sorted(unique_numbers)
 			for i,number in enumerate(slice):
 				if number==0: continue
 				slice[i] = unique_numbers_ordered.index(number) + 1
@@ -940,8 +940,8 @@ class Poem(object):
 
 			logging.debug(('Expecting these edges:', edges_exp))
 			logging.debug(('Found these edges:', edges_obs))
-			logging.debug(('These edges unexpectedly present:',sorted(list(set_edges_obs-set_edges_exp))))
-			logging.debug(('These edges unexpectedly absent:',sorted(list(set_edges_exp-set_edges_obs))))
+			logging.debug(('These edges unexpectedly present:',sorted(set_edges_obs-set_edges_exp)))
+			logging.debug(('These edges unexpectedly absent:',sorted(set_edges_exp-set_edges_obs)))
 
 			# @NEW
 			#return np.mean([int(x!=y) for x,y in zip(scheme_exp,scheme_obs)])
@@ -989,10 +989,10 @@ class Poem(object):
 			#if scheme_score:
 			scheme_scores[(schemed['Form'],scheme)]=scheme_score
 
-		odx['rhyme_schemes']=sorted(list(scheme_scores.items()),key=lambda lt: -lt[1])[:5]
+		odx['rhyme_schemes']=sorted(scheme_scores.items(),key=lambda lt: -lt[1])[:5]
 		#for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (lt[1],-len(lt[0]))):
 		# @NEW jaccard
-		for scheme,scheme_score in sorted(list(scheme_scores.items()),key=lambda lt: (-lt[1],-len(lt[0]))):
+		for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (-lt[1],-len(lt[0]))):
 			odx['rhyme_scheme']=scheme
 			odx['rhyme_scheme_name']=scheme[0]
 			odx['rhyme_scheme_form']=scheme[1]
@@ -1028,7 +1028,7 @@ def num_beats(line):
 
 def transpose(slice):
 	unique_numbers=set(slice)
-	unique_numbers_ordered=sorted(list(unique_numbers))
+	unique_numbers_ordered=sorted(unique_numbers)
 	for i,number in enumerate(slice):
 		if number==0: continue
 		slice[i] = unique_numbers_ordered.index(number) + 1
@@ -1086,7 +1086,7 @@ def toks2freq(l,tfy=False):
 	c=Counter(l)
 	if tfy:
 		summ=float(sum(c.values()))
-		for k,v in list(c.items()):
+		for k,v in c.items():
 			c[k]=v/summ
 	return c
 
