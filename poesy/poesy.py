@@ -1,9 +1,10 @@
 ## encoding=utf-8
-from __future__ import division
+
 import sys,os,codecs
-import cPickle,random,numpy as np
+import pickle,random,numpy as np
 import logging
 from collections import Counter
+from functools import reduce
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -68,7 +69,7 @@ class Poem(object):
 
 		##
 		# Unicode tricks
-		txt=txt.replace(u'è','-e')
+		txt=txt.replace('è','-e')
 		##
 
 		self.title=title if title else txt.split('\n')[0].strip()
@@ -90,8 +91,8 @@ class Poem(object):
 				lineid=(linenum, stanzanum)
 				linetext=line
 				linetext=linetext.replace('& ','and ')
-				linetext=linetext.replace(u'—',' ')
-				linetext=linetext.replace(u'&ebar;','e')
+				linetext=linetext.replace('—',' ')
+				linetext=linetext.replace('&ebar;','e')
 				lined[lineid]=linetext
 
 			stanza_lens+=[num_line_in_stanza]
@@ -194,7 +195,7 @@ class Poem(object):
 			pure_parse=''
 			for parse in bp:
 				for mpos in parse.positions:
-					for ck,cv in mpos.constraintScores.items():
+					for ck,cv in list(mpos.constraintScores.items()):
 						ck=ck.name
 						if not ck in viold: viold[ck]=[]
 						viold[ck]+=[0 if not cv else 1]
@@ -202,7 +203,7 @@ class Poem(object):
 					pure_parse+=mstr
 					mstrs+=[mstr]
 			line_mstr='|'.join(mstrs)
-			line_parse="||".join(unicode(p) for p in bp)
+			line_parse="||".join(str(p) for p in bp)
 			ws_starts += [pure_parse[0]]
 			ws_ends += [pure_parse[-1]]
 			ws_fourths += [pure_parse[3:4]]
@@ -210,10 +211,10 @@ class Poem(object):
 
 
 		mstr_freqs=toks2freq(all_mstrs,tfy=True)
-		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
-		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
-		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
-		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in list(mstr_freqs.items()): datad['mpos_'+k]=v
+		for k,v in list(toks2freq(ws_ends,tfy=True).items()): datad['perc_lines_ending_'+k]=v
+		for k,v in list(toks2freq(ws_starts,tfy=True).items()): datad['perc_lines_starting_'+k]=v
+		for k,v in list(toks2freq(ws_fourths,tfy=True).items()): datad['perc_lines_fourthpos_'+k]=v
 
 
 		## DECIDE WHETHER TERNARY / BINARY FOOT
@@ -265,7 +266,7 @@ class Poem(object):
 
 		## TOTAL METRICAL VIOLATIONS
 		sumviol=0
-		for ck,cv in viold.items():
+		for ck,cv in list(viold.items()):
 			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
@@ -318,7 +319,7 @@ class Poem(object):
 			pure_parse=''
 			for parse in bp:
 				for mpos in parse.positions:
-					for ck,cv in mpos.constraintScores.items():
+					for ck,cv in list(mpos.constraintScores.items()):
 						ck=ck.name
 						if not ck in viold: viold[ck]=[]
 						viold[ck]+=[0 if not cv else 1]
@@ -327,7 +328,7 @@ class Poem(object):
 					pure_parse+=mstr
 					mstrs+=[mstr]
 			line_mstr='|'.join(mstrs)
-			line_parse="||".join(unicode(p) for p in bp)
+			line_parse="||".join(str(p) for p in bp)
 			ws_starts += [pure_parse[0]]
 			ws_ends += [pure_parse[-1]]
 			ws_fourths += [pure_parse[3:4]]
@@ -335,11 +336,11 @@ class Poem(object):
 			all_mstrs+=mstrs
 
 		mstr_freqs=toks2freq(all_mstrs,tfy=True)
-		for k,v in mstr_freqs.items(): datad['mpos_'+k]=v
+		for k,v in list(mstr_freqs.items()): datad['mpos_'+k]=v
 
-		for k,v in toks2freq(ws_ends,tfy=True).items(): datad['perc_lines_ending_'+k]=v
-		for k,v in toks2freq(ws_starts,tfy=True).items(): datad['perc_lines_starting_'+k]=v
-		for k,v in toks2freq(ws_fourths,tfy=True).items(): datad['perc_lines_fourthpos_'+k]=v
+		for k,v in list(toks2freq(ws_ends,tfy=True).items()): datad['perc_lines_ending_'+k]=v
+		for k,v in list(toks2freq(ws_starts,tfy=True).items()): datad['perc_lines_starting_'+k]=v
+		for k,v in list(toks2freq(ws_fourths,tfy=True).items()): datad['perc_lines_fourthpos_'+k]=v
 
 		d=datad
 		#d['type_foot']='ternary' if d.get('mpos_ww',0)>0.15 and d.get('mpos_w',0)<.35 else 'binary'
@@ -389,7 +390,7 @@ class Poem(object):
 
 		## VIOLATIONS
 		sumviol=0
-		for ck,cv in viold.items():
+		for ck,cv in list(viold.items()):
 			avg=np.mean(cv) if cv else ''
 			d['constraint_'+ck.replace('.','_')]=avg
 			sumviol+=avg
@@ -505,7 +506,7 @@ class Poem(object):
 		stanzanow=None
 
 		lineid2linestr=dict((lineid,line.parse_str(viols=False)) for lineid,line in sorted(self.prosodic.items()))
-		maxlinelen=max(len(l) for l in lineid2linestr.values())
+		maxlinelen=max(len(l) for l in list(lineid2linestr.values()))
 		linelen=maxlinelen+5
 
 		for lineid,line in sorted(self.prosodic.items()):
@@ -564,7 +565,7 @@ class Poem(object):
 		)
 
 		ostr=table+'\n\n\nestimated schema\n----------\n'+schemestr1
-		print ostr
+		print(ostr)
 
 	@property
 	def statd(self):
@@ -574,17 +575,17 @@ class Poem(object):
 			## Scheme
 			for x,y in [('beat',True), ('syll',False)]:
 				sd=self.get_schemed(beat=y)
-				for sk,sv in sd.iteritems():
+				for sk,sv in sd.items():
 					dx[x+'_'+sk]=sv
 
 			## Length
 			dx['num_lines']=self.numLines
 
 			## Meter
-			for k,v in self.meterd.items(): dx['meter_'+k]=v
+			for k,v in list(self.meterd.items()): dx['meter_'+k]=v
 
 			## Rhyme
-			for k,v in self.rhymed.items():
+			for k,v in list(self.rhymed.items()):
 				if k=='rhyme_schemes' and v: v=v[-5:]
 				dx[k]=v
 		return self._statd
@@ -603,7 +604,7 @@ class Poem(object):
 		# elif schemetype=='Complex':
 		#
 		# 	return
-		schemedetails='('+'-'.join(unicode(sx) for sx in scheme)+')'
+		schemedetails='('+'-'.join(str(sx) for sx in scheme)+')'
 		return schemetype+' '+schemedetails.lower()
 
 
@@ -661,7 +662,7 @@ class Poem(object):
 			average_length_per_pos=dict((s_i,[]) for s_i in range(seq_length))
 			for l_i,l_x in enumerate(lengths):
 				average_length_per_pos[l_i % seq_length] += [l_x]
-			for k,v in average_length_per_pos.items():
+			for k,v in list(average_length_per_pos.items()):
 				median=np.median(v) if len(v)>1 else v[0]
 				average_length_per_pos[k]=int(median)
 
@@ -744,7 +745,7 @@ class Poem(object):
 	@property
 	def linelength(self):	# median line length
 		if not hasattr(self,'_linelength'):
-			self._linelength=np.median(self.linelengths.values())
+			self._linelength=np.median(list(self.linelengths.values()))
 		return self._linelength
 
 
@@ -818,7 +819,7 @@ class Poem(object):
 		odx['rhyme_scheme_form']=''
 		odx['rhyme_scheme_accuracy']=''
 		self.rhyme_net()
-		for k,v in self.discover_rhyme_scheme(self.rime_ids).items(): odx[k]=v
+		for k,v in list(self.discover_rhyme_scheme(self.rime_ids).items()): odx[k]=v
 		return odx
 
 
@@ -836,8 +837,8 @@ class Poem(object):
 				for lineid2 in prev_lines + next_lines:
 					line1=self.prosodic[lineid1]
 					line2=self.prosodic[lineid2]
-					node1=unicode(lineid1[0]).zfill(6)+': '+self.lined[lineid1]
-					node2=unicode(lineid2[0]).zfill(6)+': '+self.lined[lineid2]
+					node1=str(lineid1[0]).zfill(6)+': '+self.lined[lineid1]
+					node2=str(lineid2[0]).zfill(6)+': '+self.lined[lineid2]
 					dist=line1.rime_distance(line2)
 
 					odx={'node1':node1,'node2':node2, 'dist':dist, 'lineid1':lineid1, 'lineid2':lineid2}
@@ -854,7 +855,7 @@ class Poem(object):
 		for node in sorted(G.nodes()):
 			#print "NODE",node
 			edged=G.edge if hasattr(G,'edge') else G.adj  # diff versions of networkx?
-			neighbors=sorted(edged[node].keys(),key=lambda n2: G[node][n2]['weight'])
+			neighbors=sorted(list(edged[node].keys()),key=lambda n2: G[node][n2]['weight'])
 			#neighbors=[n for n in neighbors if n>node]
 			closest_neighbor=neighbors[0]
 			#print 'closest neighbor:',closest_neighbor
@@ -880,7 +881,7 @@ class Poem(object):
 				nodenum=nnum
 				nnum+=1
 
-			if toprint: toprintstr+=[node+'\t'+unicode(nodenum)]
+			if toprint: toprintstr+=[node+'\t'+str(nodenum)]
 			G.node[node]['rime_id']=nodenum
 			ris+=[nodenum]
 
@@ -890,9 +891,9 @@ class Poem(object):
 
 		self.rhymeG=G
 		if toprint:
-			print
-			print '\n'.join(toprintstr)
-			print
+			print()
+			print('\n'.join(toprintstr))
+			print()
 
 		# @NEW
 		#self.rime_ids=transpose(self.rime_ids)
@@ -988,10 +989,10 @@ class Poem(object):
 			#if scheme_score:
 			scheme_scores[(schemed['Form'],scheme)]=scheme_score
 
-		odx['rhyme_schemes']=sorted(scheme_scores.items(),key=lambda lt: -lt[1])[:5]
+		odx['rhyme_schemes']=sorted(list(scheme_scores.items()),key=lambda lt: -lt[1])[:5]
 		#for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (lt[1],-len(lt[0]))):
 		# @NEW jaccard
-		for scheme,scheme_score in sorted(scheme_scores.items(),key=lambda lt: (-lt[1],-len(lt[0]))):
+		for scheme,scheme_score in sorted(list(scheme_scores.items()),key=lambda lt: (-lt[1],-len(lt[0]))):
 			odx['rhyme_scheme']=scheme
 			odx['rhyme_scheme_name']=scheme[0]
 			odx['rhyme_scheme_form']=scheme[1]
@@ -1077,7 +1078,7 @@ def read_tsv(fn,sep='\t'):
 
 def hash(string):
 	import hashlib
-	if type(string)==unicode:
+	if type(string)==str:
 		string=string.encode('utf-8')
 	return str(hashlib.sha224(string).hexdigest())
 
@@ -1085,7 +1086,7 @@ def toks2freq(l,tfy=False):
 	c=Counter(l)
 	if tfy:
 		summ=float(sum(c.values()))
-		for k,v in c.items():
+		for k,v in list(c.items()):
 			c[k]=v/summ
 	return c
 
