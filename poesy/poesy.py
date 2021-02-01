@@ -882,7 +882,7 @@ class Poem(object):
 				nnum+=1
 
 			if toprint: toprintstr+=[node+'\t'+str(nodenum)]
-			G.node[node]['rime_id']=nodenum
+			G.nodes[node]['rime_id']=nodenum
 			ris+=[nodenum]
 
 		self.rhyme_scheme=''
