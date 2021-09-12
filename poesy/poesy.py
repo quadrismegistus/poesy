@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 # Constants
 PATH_RHYME_SCHEMES = os.path.join(os.path.dirname(__file__),'schemes','rhyme_schemes.txt')
 RHYME_SCHEMES=None
-METER='meter_default'
+METER='default_english'
 
 MAX_RHYME_DIST=5
 
