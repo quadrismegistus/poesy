@@ -20,7 +20,7 @@ setup(
     license='MPL-2.0',
     packages=['poesy'],
     install_requires=requirements,
-    include_package_data=True,
+    package_data={"poesy": ["schemes/*.txt"]},
     classifiers=[
         #'Development Status :: 3 - Alpha',
         #'Intended Audience :: Science/Research',
