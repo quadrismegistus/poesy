@@ -1,16 +1,17 @@
 ## encoding=utf-8
-from __future__ import division
+
 import sys,os,codecs
-import cPickle,random,numpy as np
+import pickle,random,numpy as np
 import logging
 from collections import Counter
+from functools import reduce
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Constants
 PATH_RHYME_SCHEMES = os.path.join(os.path.dirname(__file__),'schemes','rhyme_schemes.txt')
 RHYME_SCHEMES=None
-METER='meter_default'
+METER='default_english'
 
 MAX_RHYME_DIST=5
 
@@ -68,7 +69,7 @@ class Poem(object):
 
 		##
 		# Unicode tricks
-		txt=txt.replace(u'è','-e')
+		txt=txt.replace('è','-e')
 		##
 
 		self.title=title if title else txt.split('\n')[0].strip()
@@ -90,8 +91,8 @@ class Poem(object):
 				lineid=(linenum, stanzanum)
 				linetext=line
 				linetext=linetext.replace('& ','and ')
-				linetext=linetext.replace(u'—',' ')
-				linetext=linetext.replace(u'&ebar;','e')
+				linetext=linetext.replace('—',' ')
+				linetext=linetext.replace('&ebar;','e')
 				lined[lineid]=linetext
 
 			stanza_lens+=[num_line_in_stanza]
@@ -202,7 +203,7 @@ class Poem(object):
 					pure_parse+=mstr
 					mstrs+=[mstr]
 			line_mstr='|'.join(mstrs)
-			line_parse="||".join(unicode(p) for p in bp)
+			line_parse="||".join(str(p) for p in bp)
 			ws_starts += [pure_parse[0]]
 			ws_ends += [pure_parse[-1]]
 			ws_fourths += [pure_parse[3:4]]
@@ -327,7 +328,7 @@ class Poem(object):
 					pure_parse+=mstr
 					mstrs+=[mstr]
 			line_mstr='|'.join(mstrs)
-			line_parse="||".join(unicode(p) for p in bp)
+			line_parse="||".join(str(p) for p in bp)
 			ws_starts += [pure_parse[0]]
 			ws_ends += [pure_parse[-1]]
 			ws_fourths += [pure_parse[3:4]]
@@ -564,7 +565,7 @@ class Poem(object):
 		)
 
 		ostr=table+'\n\n\nestimated schema\n----------\n'+schemestr1
-		print ostr
+		print(ostr)
 
 	@property
 	def statd(self):
@@ -574,7 +575,7 @@ class Poem(object):
 			## Scheme
 			for x,y in [('beat',True), ('syll',False)]:
 				sd=self.get_schemed(beat=y)
-				for sk,sv in sd.iteritems():
+				for sk,sv in sd.items():
 					dx[x+'_'+sk]=sv
 
 			## Length
@@ -603,7 +604,7 @@ class Poem(object):
 		# elif schemetype=='Complex':
 		#
 		# 	return
-		schemedetails='('+'-'.join(unicode(sx) for sx in scheme)+')'
+		schemedetails='('+'-'.join(str(sx) for sx in scheme)+')'
 		return schemetype+' '+schemedetails.lower()
 
 
@@ -666,7 +667,7 @@ class Poem(object):
 				average_length_per_pos[k]=int(median)
 
 			SOME_possibilities = [[rx for rx in range(average_length_per_pos[x_i]-1,average_length_per_pos[x_i]+2)] for x_i,x in enumerate(range(seq_length))]
-			combo_possibilities = list(product(*SOME_possibilities))
+			combo_possibilities = product(*SOME_possibilities)
 			for combo in combo_possibilities:
 				if len(combo)>1 and len(set(combo))==1: continue
 				model_lengths=[]
@@ -744,7 +745,7 @@ class Poem(object):
 	@property
 	def linelength(self):	# median line length
 		if not hasattr(self,'_linelength'):
-			self._linelength=np.median(self.linelengths.values())
+			self._linelength=np.median(list(self.linelengths.values()))
 		return self._linelength
 
 
@@ -836,8 +837,8 @@ class Poem(object):
 				for lineid2 in prev_lines + next_lines:
 					line1=self.prosodic[lineid1]
 					line2=self.prosodic[lineid2]
-					node1=unicode(lineid1[0]).zfill(6)+': '+self.lined[lineid1]
-					node2=unicode(lineid2[0]).zfill(6)+': '+self.lined[lineid2]
+					node1=str(lineid1[0]).zfill(6)+': '+self.lined[lineid1]
+					node2=str(lineid2[0]).zfill(6)+': '+self.lined[lineid2]
 					dist=line1.rime_distance(line2)
 
 					odx={'node1':node1,'node2':node2, 'dist':dist, 'lineid1':lineid1, 'lineid2':lineid2}
@@ -880,8 +881,8 @@ class Poem(object):
 				nodenum=nnum
 				nnum+=1
 
-			if toprint: toprintstr+=[node+'\t'+unicode(nodenum)]
-			G.node[node]['rime_id']=nodenum
+			if toprint: toprintstr+=[node+'\t'+str(nodenum)]
+			G.nodes[node]['rime_id']=nodenum
 			ris+=[nodenum]
 
 		self.rhyme_scheme=''
@@ -890,9 +891,9 @@ class Poem(object):
 
 		self.rhymeG=G
 		if toprint:
-			print
-			print '\n'.join(toprintstr)
-			print
+			print()
+			print('\n'.join(toprintstr))
+			print()
 
 		# @NEW
 		#self.rime_ids=transpose(self.rime_ids)
@@ -909,7 +910,7 @@ class Poem(object):
 
 		def translate_slice(slice):
 			unique_numbers=set(slice)
-			unique_numbers_ordered=sorted(list(unique_numbers))
+			unique_numbers_ordered=sorted(unique_numbers)
 			for i,number in enumerate(slice):
 				if number==0: continue
 				slice[i] = unique_numbers_ordered.index(number) + 1
@@ -939,8 +940,8 @@ class Poem(object):
 
 			logging.debug(('Expecting these edges:', edges_exp))
 			logging.debug(('Found these edges:', edges_obs))
-			logging.debug(('These edges unexpectedly present:',sorted(list(set_edges_obs-set_edges_exp))))
-			logging.debug(('These edges unexpectedly absent:',sorted(list(set_edges_exp-set_edges_obs))))
+			logging.debug(('These edges unexpectedly present:',sorted(set_edges_obs-set_edges_exp)))
+			logging.debug(('These edges unexpectedly absent:',sorted(set_edges_exp-set_edges_obs)))
 
 			# @NEW
 			#return np.mean([int(x!=y) for x,y in zip(scheme_exp,scheme_obs)])
@@ -1027,7 +1028,7 @@ def num_beats(line):
 
 def transpose(slice):
 	unique_numbers=set(slice)
-	unique_numbers_ordered=sorted(list(unique_numbers))
+	unique_numbers_ordered=sorted(unique_numbers)
 	for i,number in enumerate(slice):
 		if number==0: continue
 		slice[i] = unique_numbers_ordered.index(number) + 1
@@ -1077,7 +1078,7 @@ def read_tsv(fn,sep='\t'):
 
 def hash(string):
 	import hashlib
-	if type(string)==unicode:
+	if type(string)==str:
 		string=string.encode('utf-8')
 	return str(hashlib.sha224(string).hexdigest())
 

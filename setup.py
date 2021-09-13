@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name='poesy',
-    version='0.1.8',
+    version='0.2.0',
     description=('Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -20,7 +20,7 @@ setup(
     license='MPL-2.0',
     packages=['poesy'],
     install_requires=requirements,
-    include_package_data=True,
+    package_data={"poesy": ["schemes/*.txt"]},
     classifiers=[
         #'Development Status :: 3 - Alpha',
         #'Intended Audience :: Science/Research',

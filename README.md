@@ -163,11 +163,11 @@ Every poem has a number of dictionaries, each keyed to a "line ID", a tuple of `
 ```python
 # The dictionary storing the string representation for the line:
 for lineid,line_str in sorted(poem.lined.items()):
-    print lineid,line_str
+    print(lineid,line_str)
     
 # Use this dictionary to loop over prosodic's Line objects instead
 for lineid,line_obj in sorted(poem.prosodic.items()):
-    print lineid,line_obj.bestParse()
+    print(lineid,line_obj.bestParse())
     
 # Other dictionaries
 poem.linenums              # lineid -> line number within poem
