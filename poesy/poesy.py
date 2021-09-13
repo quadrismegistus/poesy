@@ -15,6 +15,9 @@ METER='default_english'
 
 MAX_RHYME_DIST=5
 
+# External Config
+PROSODIC_CONFIG = {}
+
 def test():
 	# poemtxt="""FROM fairest creatures we desire increase,
 	# That thereby beauty's rose might never die,
@@ -718,6 +721,7 @@ class Poem(object):
 		if not hasattr(self,'_prosodic'):
 			import prosodic as p
 			p.config['print_to_screen']=0
+			p.config.update(PROSODIC_CONFIG)
 			self._prosodic=pd={}
 			numlines=len(self.lined)
 			for _i,(i,line) in enumerate(sorted(self.lined.items())):
