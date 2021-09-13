@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name='poesy',
-    version='0.2.8',
+    version='0.2.0',
     description=('Poetic processing, for Python'),
     long_description=long_description,
     long_description_content_type="text/markdown",
