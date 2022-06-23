@@ -1,6 +1,6 @@
+prosodic
 networkx
 numpy
 python-Levenshtein
 scipy
 tabulate
-prosodic
