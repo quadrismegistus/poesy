@@ -12,16 +12,7 @@ For a demo of poesy's installation and in action, see [this Colab notebook](http
 
 ## Installation
 
-### 1. Install Poesy
-
-Install:
-
-```
-pip install -U git+https://github.com/quadrismegistus/poesy
-```
-
-
-### 2. Insteall espeak (TTS)
+### 1. Insteall espeak (TTS)
 
 Install espeak, free TTS software, to 'sound out' unknown words. See [here](http://espeak.sourceforge.net/download.html) for all downloads.
 
@@ -35,6 +26,13 @@ Install espeak, free TTS software, to 'sound out' unknown words. See [here](http
 * On Windows:
         Download and install from http://espeak.sourceforge.net/download.html.
 
+### 2. Install Poesy
+
+Install:
+
+```
+pip install -U git+https://github.com/quadrismegistus/poesy
+```
 
 ## Usage
 
