@@ -12,7 +12,7 @@ For a demo of poesy's installation and in action, see [this Colab notebook](http
 
 ## Installation
 
-### 1. Insteall espeak (TTS)
+### 1. Insteall espeak
 
 Install espeak, free TTS software, to 'sound out' unknown words. See [here](http://espeak.sourceforge.net/download.html) for all downloads.
 
