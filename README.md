@@ -20,13 +20,6 @@ Install:
 pip install -U git+https://github.com/quadrismegistus/poesy
 ```
 
-Or install latest sources (advanced):
-
-```
-git clone git@github.com:quadrismegistus/poesy.git
-cd poesy
-python setup.py develop
-```
 
 ### 2. Insteall espeak (TTS)
 
