@@ -25,8 +25,7 @@ pip install -U git+https://github.com/quadrismegistus/poesy
 
 Install espeak, free TTS software, to 'sound out' unknown words. See [here](http://espeak.sourceforge.net/download.html) for all downloads.
 
-* On Linux, type into the terminal:
-        ```apt-get install espeak```
+* On Linux: ```apt-get install espeak```
     
 * On Mac:
   * Install [homebrew](brew.sh) if not already installed.
