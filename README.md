@@ -6,14 +6,18 @@ Code developed in the Stanford Literary Lab's "Transhistorical Poetry Project" b
 
 Poesy is built on [Prosodic](http://github.com/quadrismegistus/prosodic), a metrical-phonological parser written in Python.
 
+## Demo
+
+For a demo of poesy's installation and in action, see [this Colab notebook](https://colab.research.google.com/drive/1pl0qY8bi-QD_peC2mQVNCG4lxICxImwy?usp=sharing).
+
 ## Installation
 
 ### 1. Install Poesy
 
-Install from pip (preferred):
+Install:
 
 ```
-pip install poesy
+pip install -U git+https://github.com/quadrismegistus/poesy
 ```
 
 Or install latest sources (advanced):
@@ -24,15 +28,21 @@ cd poesy
 python setup.py develop
 ```
 
-### 2. Install eSpeak (optional but recommended)
+### 2. Insteall espeak (TTS)
 
-[eSpeak](http://espeak.sourceforge.net/) is an open-source text-to-speech (TTS) engine for Windows and Unix systems (including Mac OS X). Poesy, built on [Prosodic](https://github.com/quadrismegistus/prosodic), uses it in order to sound out unfamiliar words. Otherwise, lines with words not contained in the CMU Pronunciation Dictionary will not be available for metrical parsing.
+Install espeak, free TTS software, to 'sound out' unknown words. See [here](http://espeak.sourceforge.net/download.html) for all downloads.
 
-[Download eSpeak for your operating system](http://espeak.sourceforge.net/download.html). Or, if you're running Mac OS X, install eSpeak with the [HomeBrew package manager](http://brew.sh/):
+* On Linux, type into the terminal:
+        ```apt-get install espeak```
+    
+* On Mac:
+  * Install [homebrew](brew.sh) if not already installed.
 
-```
-brew install espeak
-```
+  * Type into the Terminal app: `brew install espeak`
+    
+* On Windows:
+        Download and install from http://espeak.sourceforge.net/download.html.
+
 
 ## Usage
 
