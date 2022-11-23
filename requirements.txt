@@ -1,4 +1,4 @@
-prosodic
+git+https://github.com/yueximo/prosodic@master
 networkx
 numpy
 python-Levenshtein
