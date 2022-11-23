@@ -534,15 +534,9 @@ class Poem(object):
 			ostr+=[oline]
 		return '\n'.join(ostr)
 
-	def summary(self,header=['lineid2', 'parse', 'rhyme', 'num_feet', 'num_sylls','num_parses']):
+	def summary(self,header=['parse']):
 		colnames={
-		'num_feet':'#feet',
-		'num_sylls':'#syll',
-		'lineid':'(#ln,#st)',
-		'lineid2':'(#s,#l)',
-		'rhyme':'rhyme',
 		'parse':'parse',
-		'num_parses':'#parse'
 		}
 
 		from tabulate import tabulate
@@ -569,6 +563,23 @@ class Poem(object):
 
 		ostr=table+'\n\n\nestimated schema\n----------\n'+schemestr1
 		print(ostr)
+	
+
+	def getParseData(self, header=['parse']):
+		data=[]
+		stanzanow=None
+		for row in self.lineld:
+			if stanzanow is None: stanzanow=row['#stanza']
+			if stanzanow!=row['#stanza']:
+				data+=['']
+				stanzanow=row['#stanza']
+
+			datarow=[row[h] for h in header]
+			data+=[datarow]
+		return data
+
+	def getSummary(self):
+		return [self.statd['meter_type_scheme'].title(), self.statd['beat_scheme_repr'], self.statd['syll_scheme_repr'], self.statd['rhyme_scheme_name'], self.statd['rhyme_scheme_form']]
 
 	@property
 	def statd(self):
@@ -591,6 +602,7 @@ class Poem(object):
 			for k,v in self.rhymed.items():
 				if k=='rhyme_schemes' and v: v=v[-5:]
 				dx[k]=v
+				
 		return self._statd
 
 	def schemetype(self,scheme):
@@ -1027,8 +1039,6 @@ class Poem(object):
 
 def num_beats(line):
 	return len([mpos for mpos in line.bestParses()[0].positions if mpos.meterVal=='s'])
-
-
 
 def transpose(slice):
 	unique_numbers=set(slice)
