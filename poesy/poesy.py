@@ -252,13 +252,7 @@ class Poem(object):
     @cached_property
     def linelengths(self):
         """Dictionary of lineid -> number of syllables (canonical pronunciation)."""
-        counts = getattr(self.text, 'line_num_sylls', None)
-        if counts is None:
-            # prosodic 3.4.0 has no public accessor yet (added upstream in
-            # prosodic#133); replicate its canonical-syllable count
-            df = self.text._syll_df
-            canonical = df[(df['form_idx'] == 0) & (~df['is_punc'])]
-            counts = canonical.groupby('line_num').size().to_dict()
+        counts = self.text.line_num_sylls
         return {lineid: int(counts.get(lineid[0], 0)) for lineid in sorted(self.lined)}
 
     @cached_property

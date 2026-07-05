@@ -13,7 +13,7 @@ authors = [
     { name = "Ryan Heuser", email = "heuser@stanford.edu" },
 ]
 dependencies = [
-    "prosodic>=3.4,<4",
+    "prosodic>=3.5,<4",
     "tabulate",
 ]
 classifiers = [

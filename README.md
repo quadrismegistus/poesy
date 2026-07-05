@@ -71,15 +71,15 @@ A quick tabular summary of most of the annotations Poesy has made on the poem.
 
       (#s,#l)  parse                                             rhyme      #feet    #syll    #parse
     ---------  ------------------------------------------------  -------  -------  -------  --------
-         1.1   when|IN|the|CHRO|ni|CLE*|of|WAS|ted|TIME          a              5       10         1
-         1.2   i|SEE|des|CRIP|tions|OF*|the|FAI|rest|WIGHTS      b              5       10         1
-         1.3   and|BEA|uty|MA|king|BEA|u|TIFUL*|old*|RHYME       a              5       10         3
-         1.4   in|PRAISE|of|LA|dies|DEAD|and|LO|vely|KNIGHTS     b              5       10         1
-         1.5   then|IN|the|BLA|zon|OF*|sweet*|BEA|uty's|BEST     -              5       10         4
+         1.1   when|IN|the|CHRO|ni|CLE*|of|WA|sted|TIME          a              5       10         1
+         1.2   i|SEE|de|SCRIP|tions|OF*|the|FAI|rest|WIGHTS      b              5       10         1
+         1.3   and|BEAU|ty|MA|king|BEAU|ti|FUL*|old*|RHYME       a              5       10         3
+         1.4   in|PRAISE|of|LA|dies|DEAD|and|LOVE|ly|KNIGHTS     b              5       10         1
+         1.5   then|IN|the|BLA|zon|OF*|sweet*|BEAU|ty's|BEST     -              5       10         4
          1.6   of|HAND|of|FOOT|of|LIP|of|EYE|of|BROW             c              5       10         1
-         1.7   i|SEE|their.an*|TIQUE.PEN*|would|HAVE|ex|PRESS'D  -              4       10         6
-         1.8   E|ven|SUCH*|a|BEA|uty|AS*|you|MAS|ter|NOW         c              6       11         2
-         1.9   so|ALL|their|PRAI|ses|ARE*|but|PROP|he.cies*      -              4       10         3
+         1.7   i|SEE|their.an*|TIQUE.PEN*|would|HAVE|e|XPRESS'D  -              4       10         6
+         1.8   E|ven|SUCH*|a|BEAU|ty|AS*|you|MA|ster|NOW         c              6       11         2
+         1.9   so|ALL|their|PRAI|ses|ARE*|but|PRO|phe.cies*      -              4       10         3
          1.1   of|THIS*|our|TIME|all|YOU*|pre|FI|gu.ring*        d              4       10         6
          1.11  and|FOR*|they|LOOK'D|but|WITH*|di|VI|ning|EYES    e              5       10         2
          1.12  they|HAD|not|SKILL|e|NOUGH|your|WORTH|to|SING     d              5       10         1
