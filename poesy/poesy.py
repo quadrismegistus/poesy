@@ -80,7 +80,10 @@ class Poem(object):
         self.genn = True
 
         import prosodic
-        self.text = prosodic.Text(txt, lang=lang)
+        # TextModel directly (not the prosodic.Text factory, which returns a
+        # RemoteText when a prosodic server is configured — the shim needs a
+        # local model for .stanzas / analysis access)
+        self.text = prosodic.TextModel(txt=txt, lang=lang)
 
     @staticmethod
     def _resolve_meter(meter):
@@ -249,9 +252,13 @@ class Poem(object):
     @cached_property
     def linelengths(self):
         """Dictionary of lineid -> number of syllables (canonical pronunciation)."""
-        df = self.text._syll_df
-        canonical = df[(df['form_idx'] == 0) & (~df['is_punc'])]
-        counts = canonical.groupby('line_num').size().to_dict()
+        counts = getattr(self.text, 'line_num_sylls', None)
+        if counts is None:
+            # prosodic 3.4.0 has no public accessor yet (added upstream in
+            # prosodic#133); replicate its canonical-syllable count
+            df = self.text._syll_df
+            canonical = df[(df['form_idx'] == 0) & (~df['is_punc'])]
+            counts = canonical.groupby('line_num').size().to_dict()
         return {lineid: int(counts.get(lineid[0], 0)) for lineid in sorted(self.lined)}
 
     @cached_property
@@ -322,7 +329,8 @@ class Poem(object):
                 for cname, cviol in pos.viold.items():
                     if cviol:
                         viol_positions[cname] += 1
-        d['length_avg_line'] = statistics.mean(parselens) if parselens else ''
+        linelens = list(self.linelengths.values())
+        d['length_avg_line'] = statistics.mean(linelens) if linelens else ''
         d['length_avg_parse'] = statistics.mean(parselens) if parselens else ''
 
         sumviol = 0
@@ -597,7 +605,7 @@ class Poem(object):
         """
         Return a string version of poem: its ID
         """
-        return self.id
+        return str(self.id)
 
 
 def _best_parse(line):
