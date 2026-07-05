@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "poesy"
+version = "0.4.0"
+description = "Poetic processing, for Python"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "Ryan Heuser", email = "heuser@stanford.edu" },
+]
+dependencies = [
+    "prosodic>=3.5,<4",
+    "tabulate",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/quadrismegistus/poesy"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools]
+packages = ["poesy"]
+
+[tool.setuptools.package-data]
+poesy = ["schemes/*.txt"]
