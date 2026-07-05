@@ -1,6 +1,0 @@
-prosodic
-networkx
-numpy
-python-Levenshtein
-scipy
-tabulate
