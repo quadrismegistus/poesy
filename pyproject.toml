@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "poesy"
-version = "0.4.0"
+version = "0.4.1"
 description = "Poetic processing, for Python"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,7 +13,7 @@ authors = [
     { name = "Ryan Heuser", email = "heuser@stanford.edu" },
 ]
 dependencies = [
-    "prosodic>=3.5,<4",
+    "prosodic>=3.6,<4",
     "tabulate",
 ]
 classifiers = [
